@@ -16,3 +16,4 @@ This pipeline was written to be run on Unix based operating systems, such as the
 * samtools
 * bcftools
 * primer3
+* muscle
