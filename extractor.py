@@ -82,6 +82,7 @@ class Extractor():
 				outfn=os.path.join(self.outdir,outfile)
 				cf=ind + ".cov.txt"
 				cfn=os.path.join(self.covdir, cf)
+				print("Extracting", coord, "for", ind)
 				command = "samtools faidx " + genome + " " + coord + " | bcftools consensus -s " + ind + " -m " + cfn +  " -I " + gz + " >> " + outfn
 				#print(command)
 				self.runProgram(command)

@@ -27,9 +27,9 @@ def main():
 	cov.applyMinCov(input.args.cover, input.args.overwrite)
 
 	# Extract target plus flanking region from reference genome
-	#regions = Extractor(snps, input.args.indlist, input.args.flank)
-	#regions.extract()
-	#regions.makeCommands(input.args.genome, input.args.vcfgz) #returns list of output files
+	regions = Extractor(snps, input.args.indlist, input.args.flank)
+	regions.extract()
+	regions.makeCommands(input.args.genome, input.args.vcfgz) #returns list of output files
 
 	# operate on all output Fasta files
 	ex=os.path.join(cwd,"extracted_regions")
