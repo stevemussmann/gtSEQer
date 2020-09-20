@@ -4,7 +4,7 @@ from DefaultListOrderedDict import DefaultListOrderedDict
 
 import subprocess
 import sys
-import multiprocessing
+#import multiprocessing
 import os.path
 
 class Extractor():

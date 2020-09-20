@@ -1,18 +1,30 @@
 from __future__ import print_function
 
 import os.path
+import subprocess
+import sys
 
 class Muscle():
 	'Class for running Muscle on fasta files'
 
 	def __init__(self,f):
 		self.fas = f
-		print(self.fas)
+		basename=os.path.basename(f)
+		print("Aligning", basename)
 
 		self.cwd=os.getcwd()
 		self.aligned=os.path.join(self.cwd, "muscle_aligned")
 		if(os.path.isdir(self.aligned) != True):
 			os.mkdir(self.aligned)
+
+		command = self.makeCommand(basename)
+		print(command)
+		self.runProgram(command)
+
+	def makeCommand(self, f):
+		out=os.path.join(self.aligned, f)
+		string = "muscle -in " + self.fas + " -out " + out
+		return string
 
 	def runProgram(self,string):
 		try:
