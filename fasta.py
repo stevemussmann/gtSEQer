@@ -8,7 +8,8 @@ class Fasta():
 
 	def __init__(self, f):
 		self.fasta = f
-		print(f)
+		basename=os.path.basename(f)
+		print("Filtering", basename)
 		self.seqs = self.readFasta(self.fasta)
 		#print(self.seqs)
 		
@@ -18,7 +19,6 @@ class Fasta():
 		if(os.path.isdir(self.filt) != True):
 			os.mkdir(self.filt)
 
-		basename=os.path.basename(f)
 		self.printSeqs(basename)
 		
 
@@ -37,6 +37,8 @@ class Fasta():
 		fn=os.path.join(self.filt, bn)
 		f=open(fn, "w")
 		for seq, name in self.seqs.items():
+			if( name.startswith(">") != True ):
+				f.write(">")
 			f.write(name)
 			f.write("\n")
 			f.write(seq)
