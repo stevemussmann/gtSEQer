@@ -49,8 +49,10 @@ def main():
 		filt = Muscle(fpath)
 
 	# Run primer3
-	#for f in files:
-	#	p3 = Primer3(f)
+	cf=os.path.join(cwd, "muscle_aligned_consensus")
+	conFasta=[f for f in listdir(cf) if os.path.isfile(os.path.join(cf, f))]
+	for f in conFasta:
+		p3 = Primer3(f)
 
 main()
 
