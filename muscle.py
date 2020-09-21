@@ -8,6 +8,7 @@ from Bio import AlignIO
 from Bio.Align import AlignInfo
 
 from program import Program
+from maketestdir import MakeTestDir
 
 class Muscle():
 	'Class for running Muscle on fasta files'
@@ -18,13 +19,10 @@ class Muscle():
 
 		print("Aligning", basename)
 
-		self.cwd=os.getcwd()
-		self.aligned=os.path.join(self.cwd, "muscle_aligned")
-		self.consensus=os.path.join(self.cwd, "muscle_aligned_consensus")
-		if(os.path.isdir(self.aligned) != True):
-			os.mkdir(self.aligned)
-		if(os.path.isdir(self.consensus) != True):
-			os.mkdir(self.consensus)
+		mtd_align = MakeTestDir("muscle_aligned")
+		mtd_consensus = MakeTestDir("muscle_aligned_consensus")
+		self.aligned=mtd_align.testDir()
+		self.consensus=mtd_consensus.testDir()
 
 		self.out=os.path.join(self.aligned, basename)
 
