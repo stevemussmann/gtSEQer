@@ -35,6 +35,8 @@ class Extractor():
 				c=list()
 
 				start = int(snp) - self.flank
+				if( start < 1 ):
+					start=1
 				end = int(snp) + self.flank
 
 				#make list with coordinates for samtools
