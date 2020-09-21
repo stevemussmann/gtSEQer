@@ -7,6 +7,8 @@ import sys
 #import multiprocessing
 import os.path
 
+from program import Program
+
 class Extractor():
 	'Class for pulling genome regions from reference'
 
@@ -59,22 +61,6 @@ class Extractor():
 		#parallelize here
 		self.runCommands(genome, gz)
 
-	def runProgram(self,string):
-		try:
-			process = subprocess.Popen(string, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-			output, err = process.communicate()
-			print(err)
-			if process.returncode != 0:
-				print("Non-zero exit status:")
-				print(process.returncode)
-				raise SystemExit
-		except(KeyboardInterrupt, SystemExit):
-			raise
-		except:
-			print("Unexpected error:")
-			print(sys.exec_info())
-			raise SystemExit
-
 	def runCommands(self, genome, gz):
 		for coord in self.coords:
 			for ind in self.indlist:
@@ -84,6 +70,6 @@ class Extractor():
 				cfn=os.path.join(self.covdir, cf)
 				print("Extracting", coord, "for", ind)
 				command = "samtools faidx " + genome + " " + coord + " | bcftools consensus -s " + ind + " -m " + cfn +  " -I " + gz + " >> " + outfn
-				#print(command)
-				self.runProgram(command)
+				prog = Program(command)
+				prog.runProgram()
 				

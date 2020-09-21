@@ -4,6 +4,8 @@ import os.path
 import subprocess
 import sys
 
+from program import Program
+
 class Primer3():
 	'Class for executing primer3'
 
@@ -29,7 +31,8 @@ class Primer3():
 		#print(comm)
 
 		print("Finding primers for", fn)
-		self.runProgram(comm)
+		prog = Program(comm)
+		prog.runProgram()
 
 	def makeFile(self, name, seq):
 		fn=name + ".p3in.txt"
@@ -62,9 +65,11 @@ class Primer3():
 		f.write("\n")
 		f.write("PRIMER_MAX_NS_ACCEPTED=0")
 		f.write("\n")
-		f.write("PRIMER_PRODUCT_SIZE_RANGE=100-150")
+		f.write("PRIMER_PRODUCT_SIZE_RANGE=75-125")
 		f.write("\n")
-		f.write("PRIMER_GC_CLAMP=2")
+		f.write("PRIMER_PRODUCT_OPT_SIZE=100")
+		f.write("\n")
+		f.write("PRIMER_GC_CLAMP=1")
 		f.write("\n")
 		f.write("PRIMER_MIN_TM=58")
 		f.write("\n")
@@ -74,7 +79,7 @@ class Primer3():
 		f.write("\n")
 		f.write("PRIMER_PAIR_MAX_DIFF_TM=2")
 		f.write("\n")
-		f.write("PRIMER_MAX_POLY_X=2")
+		f.write("PRIMER_MAX_POLY_X=3")
 		f.write("\n")
 		f.write("PRIMER_MAX_HAIRPIN_TH=20")
 		f.write("\n")
@@ -122,18 +127,3 @@ class Primer3():
 		string = "primer3_core -format_output -output=" + out + " < " + indir
 		return string
 
-	def runProgram(self,string):
-		try:
-			process = subprocess.Popen(string, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-			output, err = process.communicate()
-			print(err)
-			if process.returncode != 0:
-				print("Non-zero exit status:")
-				print(process.returncode)
-				raise SystemExit
-		except(KeyboardInterrupt, SystemExit):
-			raise
-		except:
-			print("Unexpected error:")
-			print(sys.exec_info())
-			raise SystemExit

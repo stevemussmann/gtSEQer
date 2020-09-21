@@ -43,7 +43,7 @@ def main():
 
 	# use Muscle to align files
 	al=os.path.join(cwd, "filtered_sequences")
-	filteredFiles=[f for f in listdir(ex) if os.path.isfile(os.path.join(al, f))]
+	filteredFiles=[f for f in listdir(al) if os.path.isfile(os.path.join(al, f))]
 	for f in filteredFiles:
 		fpath=os.path.join(al, f)
 		filt = Muscle(fpath)
