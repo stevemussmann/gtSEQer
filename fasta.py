@@ -3,6 +3,8 @@ from __future__ import print_function
 import os.path
 from Bio import SeqIO
 
+from maketestdir import MakeTestDir
+
 class Fasta():
 	'Class for operating on fasta files'
 
@@ -14,10 +16,12 @@ class Fasta():
 		#print(self.seqs)
 		
 		#make output path if it doesn't exist
-		self.cwd=os.getcwd()
-		self.filt=os.path.join(self.cwd, "filtered_sequences")
-		if(os.path.isdir(self.filt) != True):
-			os.mkdir(self.filt)
+		mtd = MakeTestDir("filtered_sequences")
+		self.filt=mtd.testDir()
+		#self.cwd=os.getcwd()
+		#self.filt=os.path.join(self.cwd, "filtered_sequences")
+		#if(os.path.isdir(self.filt) != True):
+		#	os.mkdir(self.filt)
 
 		self.printSeqs(basename)
 		

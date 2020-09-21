@@ -5,6 +5,7 @@ from coverage import Coverage
 from DefaultListOrderedDict import DefaultListOrderedDict
 from extractor import Extractor
 from fasta import Fasta
+from maketestdir import MakeTestDir
 from muscle import Muscle
 from primer3 import Primer3
 from vcf import VCF
@@ -15,8 +16,6 @@ from os import listdir
 
 
 def main():
-	cwd = os.getcwd()
-
 	input = ComLine(sys.argv[1:])
 
 	# identify target SNPs and return coordinates in reference genome
@@ -34,22 +33,24 @@ def main():
 
 	## operate on all output Fasta files
 	# filter files
-	ex=os.path.join(cwd,"extracted_regions")
-	print(ex)
+	mtdex = MakeTestDir("extracted_regions")
+	ex = mtdex.testDir()
 	fastaFiles=[f for f in listdir(ex) if os.path.isfile(os.path.join(ex, f))]
 	for f in fastaFiles:
 		fpath=os.path.join(ex, f)
 		fas = Fasta(fpath)
 
 	# use Muscle to align files
-	al=os.path.join(cwd, "filtered_sequences")
+	mtdal = MakeTestDir("filtered_sequences")
+	al = mtdal.testDir()
 	filteredFiles=[f for f in listdir(al) if os.path.isfile(os.path.join(al, f))]
 	for f in filteredFiles:
 		fpath=os.path.join(al, f)
 		filt = Muscle(fpath)
 
 	# Run primer3
-	cf=os.path.join(cwd, "muscle_aligned_consensus")
+	mtdcf = MakeTestDir("muscle_aligned_consensus")
+	cf = mtdcf.testDir()
 	conFasta=[f for f in listdir(cf) if os.path.isfile(os.path.join(cf, f))]
 	for f in conFasta:
 		p3 = Primer3(f)

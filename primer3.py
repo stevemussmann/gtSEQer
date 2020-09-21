@@ -5,20 +5,21 @@ import subprocess
 import sys
 
 from program import Program
+from maketestdir import MakeTestDir
 
 class Primer3():
 	'Class for executing primer3'
 
 	def __init__(self, fn):
 		# make directories
-		self.cwd=os.getcwd()
-		self.fas=os.path.join(self.cwd, "muscle_aligned_consensus", fn)
-		self.p3inDir=os.path.join(self.cwd, "p3in")
-		self.p3outDir=os.path.join(self.cwd, "p3out")
-		if(os.path.isdir(self.p3inDir) != True):
-			os.mkdir(self.p3inDir)
-		if(os.path.isdir(self.p3outDir) != True):
-			os.mkdir(self.p3outDir)
+		mtd_mac = MakeTestDir("muscle_aligned_consensus")
+		mac = mtd_mac.testDir()
+		self.fas=os.path.join(mac, fn)
+
+		mtd_p3in = MakeTestDir("p3in")
+		mtd_p3out = MakeTestDir("p3out")
+		self.p3inDir=mtd_p3in.testDir()
+		self.p3outDir=mtd_p3out.testDir()
 		
 		# parse file
 		seqinfo = self.parseFile()
@@ -36,7 +37,7 @@ class Primer3():
 
 	def makeFile(self, name, seq):
 		fn=name + ".p3in.txt"
-		fn=os.path.join(self.cwd, "p3in", fn)
+		fn=os.path.join(self.p3inDir, fn)
 		
 		f = open(fn, 'w')
 		f.write("SEQUENCE_ID=") #finish this line
