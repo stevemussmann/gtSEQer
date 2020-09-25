@@ -18,9 +18,11 @@ class Program():
 				print("Non-zero exit status:")
 				print(process.returncode)
 				raise SystemExit
+			return output
+
 		except(KeyboardInterrupt, SystemExit):
 			raise
 		except:
 			print("Unexpected error:")
-			print(sys.exec_info())
+			print(sys.exc_info())
 			raise SystemExit

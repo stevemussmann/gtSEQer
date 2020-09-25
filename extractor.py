@@ -1,43 +1,58 @@
 from __future__ import print_function
 
-from DefaultListOrderedDict import DefaultListOrderedDict
-
+import json
+import os.path
 import subprocess
 import sys
-#import multiprocessing
-import os.path
 
+from maketestdir import MakeTestDir
 from program import Program
 
 class Extractor():
 	'Class for pulling genome regions from reference'
 
-	def __init__(self, f, i, e):
+	def __init__(self, f, i, e, l):
+		# tracks which files have been done
+		self.done=dict()
+		self.loadJson()
+
 		self.targets = f
 		self.flank=e
+		self.genLen=l
 		f=open(i)
 		d=f.readlines()
 		f.close()
 		d=[l.rstrip() for l in d]
 		self.indlist = d
 		self.coords=list()
+
+		self.probeTargets = dict()
 		
-		#get base of the path where coverage_files will be located
-		self.cwd=os.getcwd()
-		self.covdir=os.path.join(self.cwd, "coverage_files")
-		self.outdir=os.path.join(self.cwd, "extracted_regions")
-		if(os.path.isdir(self.outdir) != True):
-			os.mkdir(self.outdir)
+		#make sure proper directories exist
+		cov_ex = MakeTestDir("coverage_files")
+		self.covdir=cov_ex.testDir()
+		out_ex = MakeTestDir("extracted_regions")
+		self.outdir=out_ex.testDir()
 
 	def extract(self):
 		for chrom, snps in self.targets.items():
 			for snp in snps:
 				c=list()
+				p=list()
 
 				start = int(snp) - self.flank
 				if( start < 1 ):
 					start=1
 				end = int(snp) + self.flank
+				if(end > self.genLen[chrom]):
+					end = self.genLen[chrom]
+
+				pstart = int(snp) - 9
+				if( pstart < 1 ):
+					pstart = 1
+				pend = int(snp) + 9
+				if(pend > self.genLen[chrom]):
+					pend = self.genLen[chrom]
 
 				#make list with coordinates for samtools
 				c.append(chrom)
@@ -50,6 +65,17 @@ class Extractor():
 				newstr="".join(c)
 				self.coords.append(newstr)
 
+				p.append(chrom)
+				p.append(":")
+				p.append(str(pstart))
+				p.append("-")
+				p.append(str(pend))
+
+				#concatenate probe coordinates
+				pnewstr="".join(p)
+
+				self.probeTargets[newstr] = pnewstr
+
 	def readFile(self):
 		f=open(self.vcf)
 		data=f.readlines()
@@ -58,20 +84,59 @@ class Extractor():
 		return data
 
 	def makeCommands(self, genome, gz):
-		#outfiles=list()
 		p=False
-		#parallelize here
 		self.runCommands(genome, gz)
 
 	def runCommands(self, genome, gz):
 		for coord in self.coords:
+			if coord not in self.done.keys():
+				self.done[coord]=list()
 			for ind in self.indlist:
-				outfile=coord.replace(":","_")
-				outfn=os.path.join(self.outdir,outfile)
-				cf=ind + ".cov.txt"
-				cfn=os.path.join(self.covdir, cf)
-				print("Extracting", coord, "for", ind)
-				command = "samtools faidx " + genome + " " + coord + " | bcftools consensus -s " + ind + " -m " + cfn +  " -I " + gz + " >> " + outfn
-				prog = Program(command)
-				prog.runProgram()
+				if(ind not in self.done[coord]):
+					outfile=coord.replace(":","_")
+					outfn=os.path.join(self.outdir,outfile)
+					cf=ind + ".cov.txt"
+					cfn=os.path.join(self.covdir, cf)
+					print("Extracting", coord, "for", ind)
+
+					# Run command to extract sequence
+					command = "samtools faidx " + genome + " " + coord + " | bcftools consensus -s " + ind + " -m " + cfn +  " -I " + gz
+					prog = Program(command)
+					output = prog.runProgram()
+					
+					# write sequence to file
+					self.parseOutput(output, outfn, ind)
+
+					# Run command to extract probe
+					probeCommand = "samtools faidx " + genome + " " + self.probeTargets[coord] + " | bcftools consensus -s " + ind + " -m " + cfn + " -I " + gz
+					probeProg = Program(probeCommand)
+					probeOutput = probeProg.runProgram()
+
+					# write probe to file
+					print(probeOutput)
+
+					# write to json file
+					self.done[coord].append(ind)
+					self.writeJson()
+
+	def parseOutput(self, o, fn, ind):
+		l = o.splitlines()
+		l[0] = l[0] + "_" + ind
+		with open(fn, 'a') as fh:
+			for item in l:
+				fh.write(item)
+				fh.write("\n")
+	
+	def loadJson(self):
+		if os.path.isfile("extractor.json"):
+			print("\n**********************************")
+			print("Resuming from previous checkpoint.")
+			print("**********************************\n")
+			with open("extractor.json") as f:
+				self.done = json.load(f)
+	
+	def writeJson(self):
+		with open("extractor.json", 'w' ) as json_file:
+			json.dump(self.done, json_file)
+
 				

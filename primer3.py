@@ -28,25 +28,29 @@ class Primer3():
 		self.makeFile(seqinfo["ID"], seqinfo["SEQUENCE"])
 
 		# run primer3_core
-		comm = self.makeCommand(fn)
+		comm, out = self.makeCommand(fn)
 		#print(comm)
 
 		print("Finding primers for", fn)
 		prog = Program(comm)
 		prog.runProgram()
 
+		self.parseOutput(out, fn)
+
 	def makeFile(self, name, seq):
 		fn=name + ".p3in.txt"
 		fn=os.path.join(self.p3inDir, fn)
 		
+		seq=seq.replace("-", "N")
+
 		f = open(fn, 'w')
-		f.write("SEQUENCE_ID=") #finish this line
-		f.write(name)
+		f.write("SEQUENCE_ID=")
+		f.write(name) #sequence name
 		f.write("\n")
-		f.write("SEQUENCE_TEMPLATE=") #finish
-		f.write(seq)
+		f.write("SEQUENCE_TEMPLATE=")
+		f.write(seq) #sequence
 		f.write("\n")
-		f.write("SEQUENCE_TARGET=150,3") #add "start coord, length"
+		f.write("SEQUENCE_TARGET=140,20") #add "start coord, length"
 		f.write("\n")
 		f.write("PRIMER_TASK=pick_detection_primers")
 		f.write("\n")
@@ -66,7 +70,7 @@ class Primer3():
 		f.write("\n")
 		f.write("PRIMER_MAX_NS_ACCEPTED=0")
 		f.write("\n")
-		f.write("PRIMER_PRODUCT_SIZE_RANGE=75-125")
+		f.write("PRIMER_PRODUCT_SIZE_RANGE=90-120")
 		f.write("\n")
 		f.write("PRIMER_PRODUCT_OPT_SIZE=100")
 		f.write("\n")
@@ -88,7 +92,7 @@ class Primer3():
 		f.write("\n")
 		f.write("P3_FILE_FLAG=1")
 		f.write("\n")
-		f.write("SEQUENCE_INTERNAL_EXCLUDED_REGION=150,3") #add "start coord, length"
+		f.write("SEQUENCE_INTERNAL_EXCLUDED_REGION=140,20") #add "start coord, length"
 		f.write("\n")
 		f.write("PRIMER_OPT_GC_PERCENT=50")
 		f.write("\n")
@@ -98,7 +102,7 @@ class Primer3():
 		f.write("\n")
 		f.write("PRIMER_EXPLAIN_FLAG=1")
 		f.write("\n")
-		f.write("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/home/mussmann/local/src/primer3/primer3/src/primer3_config") #add path to thermodynamic
+		f.write("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/home/user/local/src/primer3/primer3-master/src/primer3_config") #add path to thermodynamic
 		f.write("\n")
 		f.write("=")
 		f.write("\n")
@@ -115,9 +119,6 @@ class Primer3():
 		seqinfo["ID"] = data.pop(0).replace(">", "")
 		seqinfo["SEQUENCE"] = "".join(data).upper()
 
-		#print(seqinfo["ID"])
-		#print(seqinfo["SEQUENCE"])
-
 		return seqinfo
 
 	def makeCommand(self, fn):
@@ -126,5 +127,23 @@ class Primer3():
 		out=os.path.join(self.p3outDir, outfn)
 		indir=os.path.join(self.p3inDir, infn)
 		string = "primer3_core -format_output -output=" + out + " < " + indir
-		return string
+		return string, out
+
+	def parseOutput(self, f, fn):
+		fh=open(f)
+		data=fh.readlines()
+		fh.close()
+		data = [l.strip() for l in data]
+
+		outf = "summary.txt"
+		outfh=open(outf, 'a')
+		for line in data:
+			if(line.startswith("OLIGO") or line.startswith("LEFT") or line.startswith("RIGHT")):
+				if(line.startswith("OLIGO")):
+					outfh.write("> ")
+					outfh.write(fn)
+					outfh.write("\n")
+				outfh.write(line)
+				outfh.write("\n")
+		outfh.close()
 

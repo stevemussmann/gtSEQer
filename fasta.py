@@ -23,20 +23,20 @@ class Fasta():
 		
 
 	def readFasta(self, f):
-		per_n=55
+		per_n=60
 		sequences = dict()
 		seqs = SeqIO.parse(open(f), 'fasta')
 		for seq_record in seqs:
 			sequence = str(seq_record.seq).upper()
 			if( (float(sequence.count("N")) / float(len(sequence)) ) * 100 <= per_n):
 				if sequence not in sequences:
-					sequences[sequence] = seq_record.id
+					sequences[seq_record.id] = sequence
 		return sequences
 
 	def printSeqs(self, bn):
 		fn=os.path.join(self.filt, bn)
 		f=open(fn, "w")
-		for seq, name in self.seqs.items():
+		for name, seq in self.seqs.items():
 			if( name.startswith(">") != True ):
 				f.write(">")
 			f.write(name)

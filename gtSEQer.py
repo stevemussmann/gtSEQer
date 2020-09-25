@@ -5,6 +5,7 @@ from coverage import Coverage
 from DefaultListOrderedDict import DefaultListOrderedDict
 from extractor import Extractor
 from fasta import Fasta
+from genome import Genome
 from maketestdir import MakeTestDir
 from muscle import Muscle
 from primer3 import Primer3
@@ -18,6 +19,8 @@ from os import listdir
 def main():
 	input = ComLine(sys.argv[1:])
 
+	gen = Genome(input.args.genome)
+
 	# identify target SNPs and return coordinates in reference genome
 	target = VCF(input.args.vcf)
 	snps = target.getSNPs()
@@ -27,9 +30,9 @@ def main():
 	cov.applyMinCov(input.args.cover, input.args.overwrite)
 
 	# Extract target plus flanking region from reference genome
-	#regions = Extractor(snps, input.args.indlist, input.args.flank)
-	#regions.extract()
-	#regions.makeCommands(input.args.genome, input.args.vcfgz) #returns list of output files
+	regions = Extractor(snps, input.args.indlist, input.args.flank, gen.seqLengths)
+	regions.extract()
+	regions.makeCommands(input.args.genome, input.args.vcfgz) #returns list of output files
 
 	## operate on all output Fasta files
 	# filter files
