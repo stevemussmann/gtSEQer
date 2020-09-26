@@ -13,14 +13,15 @@ from maketestdir import MakeTestDir
 class Muscle():
 	'Class for running Muscle on fasta files'
 
-	def __init__(self,f):
+	def __init__(self,f, dirname):
 		self.fas = f
 		basename=os.path.basename(f)
 
 		print("Aligning", basename)
 
-		mtd_align = MakeTestDir("muscle_aligned")
-		mtd_consensus = MakeTestDir("muscle_aligned_consensus")
+		mtd_align = MakeTestDir(dirname)
+		dirnamecon = dirname + "_consensus"
+		mtd_consensus = MakeTestDir(dirnamecon)
 		self.aligned=mtd_align.testDir()
 		self.consensus=mtd_consensus.testDir()
 

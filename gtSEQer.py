@@ -57,7 +57,14 @@ def main():
 	filteredFiles=[f for f in listdir(al) if os.path.isfile(os.path.join(al, f))]
 	for f in filteredFiles:
 		fpath=os.path.join(al, f)
-		filt = Muscle(fpath)
+		filt = Muscle(fpath, "muscle_aligned")
+
+	mtdalp = MakeTestDir("filtered_probes")
+	alp = mtdalp.testDir()
+	filteredProbes=[f for f in listdir(alp) if os.path.isfile(os.path.join(alp, f))]
+	for f in filteredProbes:
+		fpath=os.path.join(alp, f)
+		filt = Muscle(fpath, "muscle_aligned_probes")
 
 	# Run primer3
 	mtdcf = MakeTestDir("muscle_aligned_consensus")
