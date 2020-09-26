@@ -13,7 +13,7 @@ from maketestdir import MakeTestDir
 class Muscle():
 	'Class for running Muscle on fasta files'
 
-	def __init__(self,f, dirname):
+	def __init__(self,f, dirname, jsonFile):
 		self.fas = f
 		basename=os.path.basename(f)
 

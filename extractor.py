@@ -1,10 +1,11 @@
 from __future__ import print_function
 
-import json
+#import json
 import os.path
 import subprocess
 import sys
 
+from checkpoint import Checkpoint
 from maketestdir import MakeTestDir
 from program import Program
 
@@ -13,8 +14,10 @@ class Extractor():
 
 	def __init__(self, f, i, e, l):
 		# tracks which files have been done
-		self.done=dict()
-		self.loadJson()
+		#self.done=dict()
+		#self.loadJson()
+		self.tracker = Checkpoint("extractor.json")
+		self.done=self.tracker.loadJson()
 
 		self.targets = f
 		self.flank=e
@@ -121,7 +124,8 @@ class Extractor():
 
 					# write to json file
 					self.done[coord].append(ind)
-					self.writeJson()
+					self.tracker.writeJson(self.done)
+					#self.writeJson()
 
 	def parseOutput(self, o, fn, ind):
 		l = o.splitlines()
@@ -131,16 +135,16 @@ class Extractor():
 				fh.write(item)
 				fh.write("\n")
 	
-	def loadJson(self):
-		if os.path.isfile("extractor.json"):
-			print("\n**********************************")
-			print("Resuming from previous checkpoint.")
-			print("**********************************\n")
-			with open("extractor.json") as f:
-				self.done = json.load(f)
+	#def loadJson(self):
+	#	if os.path.isfile("extractor.json"):
+	#		print("\n**********************************")
+	#		print("Resuming from previous checkpoint.")
+	#		print("**********************************\n")
+	#		with open("extractor.json") as f:
+	#			self.done = json.load(f)
 	
-	def writeJson(self):
-		with open("extractor.json", 'w' ) as json_file:
-			json.dump(self.done, json_file)
+	#def writeJson(self):
+	#	with open("extractor.json", 'w' ) as json_file:
+	#		json.dump(self.done, json_file)
 
 				
