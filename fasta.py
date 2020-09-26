@@ -8,7 +8,7 @@ from maketestdir import MakeTestDir
 class Fasta():
 	'Class for operating on fasta files'
 
-	def __init__(self, f):
+	def __init__(self, f, dirname):
 		self.fasta = f
 		basename=os.path.basename(f)
 		print("Filtering", basename)
@@ -16,7 +16,7 @@ class Fasta():
 		#print(self.seqs)
 		
 		#make output path if it doesn't exist
-		mtd = MakeTestDir("filtered_sequences")
+		mtd = MakeTestDir(dirname)
 		self.filt=mtd.testDir()
 
 		self.printSeqs(basename)

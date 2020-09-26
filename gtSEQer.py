@@ -35,13 +35,21 @@ def main():
 	regions.makeCommands(input.args.genome, input.args.vcfgz) #returns list of output files
 
 	## operate on all output Fasta files
-	# filter files
+	# filter extracted_regions
 	mtdex = MakeTestDir("extracted_regions")
 	ex = mtdex.testDir()
 	fastaFiles=[f for f in listdir(ex) if os.path.isfile(os.path.join(ex, f))]
 	for f in fastaFiles:
 		fpath=os.path.join(ex, f)
-		fas = Fasta(fpath)
+		fas = Fasta(fpath, "filtered_sequences")
+
+	# filter probes
+	mtdProbe = MakeTestDir("extracted_regions_probes")
+	probe = mtdProbe.testDir()
+	probeFiles = [f for f in listdir(probe) if os.path.isfile(os.path.join(probe, f))]
+	for f in probeFiles:
+		fpath = os.path.join(probe, f)
+		fas = Fasta(fpath, "filtered_probes")
 
 	# use Muscle to align files
 	mtdal = MakeTestDir("filtered_sequences")
