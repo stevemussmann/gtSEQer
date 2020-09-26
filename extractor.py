@@ -33,6 +33,8 @@ class Extractor():
 		self.covdir=cov_ex.testDir()
 		out_ex = MakeTestDir("extracted_regions")
 		self.outdir=out_ex.testDir()
+		probe_ex = MakeTestDir("extracted_regions_probes")
+		self.probedir=probe_ex.testDir()
 
 	def extract(self):
 		for chrom, snps in self.targets.items():
@@ -95,6 +97,7 @@ class Extractor():
 				if(ind not in self.done[coord]):
 					outfile=coord.replace(":","_")
 					outfn=os.path.join(self.outdir,outfile)
+					probefn=os.path.join(self.probedir,outfile)
 					cf=ind + ".cov.txt"
 					cfn=os.path.join(self.covdir, cf)
 					print("Extracting", coord, "for", ind)
@@ -113,7 +116,8 @@ class Extractor():
 					probeOutput = probeProg.runProgram()
 
 					# write probe to file
-					print(probeOutput)
+					self.parseOutput(probeOutput, probefn, ind)
+					#print(probeOutput)
 
 					# write to json file
 					self.done[coord].append(ind)

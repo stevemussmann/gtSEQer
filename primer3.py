@@ -32,6 +32,7 @@ class Primer3():
 		#print(comm)
 
 		print("Finding primers for", fn)
+
 		prog = Program(comm)
 		prog.runProgram()
 
@@ -102,7 +103,8 @@ class Primer3():
 		f.write("\n")
 		f.write("PRIMER_EXPLAIN_FLAG=1")
 		f.write("\n")
-		f.write("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/home/user/local/src/primer3/primer3-master/src/primer3_config") #add path to thermodynamic
+		#f.write("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/home/user/local/src/primer3/primer3-master/src/primer3_config") #add path to thermodynamic
+		f.write("PRIMER_THERMODYNAMIC_PARAMETERS_PATH=/home/mussmann/local/src/primer3/primer3/src/primer3_config") #add path to thermodynamic
 		f.write("\n")
 		f.write("=")
 		f.write("\n")
