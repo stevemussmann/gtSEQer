@@ -14,31 +14,45 @@ class Primer3():
 		# make directories
 		mtd_mac = MakeTestDir("muscle_aligned_consensus")
 		mac = mtd_mac.testDir()
-		self.fas=os.path.join(mac, fn)
+		mtd_mapc = MakeTestDir("muscle_aligned_probes_consensus")
+		mapc = mtd_mapc.testDir()
 
+		#make names with paths for template and probe sequences
+		template=os.path.join(mac, fn)
+		probe=os.path.join(mapc, fn)
+
+		# make directories to hold primer3 input and output
 		mtd_p3in = MakeTestDir("p3in")
 		mtd_p3out = MakeTestDir("p3out")
 		self.p3inDir=mtd_p3in.testDir()
 		self.p3outDir=mtd_p3out.testDir()
 		
-		# parse file
-		seqinfo = self.parseFile()
+		# parse sequence files
+		seqinfo = self.parseFile(template)
+		probeinfo = self.parseFile(probe)
 
-		# make p3in file
-		self.makeFile(seqinfo["ID"], seqinfo["SEQUENCE"])
+		# find starting position of probe
+		index = seqinfo["SEQUENCE"].find(probeinfo["SEQUENCE"])
+		print(str(index))
 
-		# run primer3_core
-		comm, out = self.makeCommand(fn)
-		#print(comm)
+		if(index > 0):
+			# make p3in file
+			self.makeFile(seqinfo["ID"], seqinfo["SEQUENCE"], index)
 
-		print("Finding primers for", fn)
+			# run primer3_core
+			comm, out = self.makeCommand(fn)
+			#print(comm)
 
-		prog = Program(comm)
-		prog.runProgram()
+			print("Finding primers for", fn)
 
-		self.parseOutput(out, fn)
+			prog = Program(comm)
+			prog.runProgram()
 
-	def makeFile(self, name, seq):
+			self.parseOutput(out, fn)
+		else:
+			print("Probe not found in sequence", fn)
+
+	def makeFile(self, name, seq, index):
 		fn=name + ".p3in.txt"
 		fn=os.path.join(self.p3inDir, fn)
 		
@@ -51,7 +65,9 @@ class Primer3():
 		f.write("SEQUENCE_TEMPLATE=")
 		f.write(seq) #sequence
 		f.write("\n")
-		f.write("SEQUENCE_TARGET=140,20") #add "start coord, length"
+		f.write("SEQUENCE_TARGET=")
+		f.write(str(index)) # start coordinate
+		f.write(",19") # length
 		f.write("\n")
 		f.write("PRIMER_TASK=pick_detection_primers")
 		f.write("\n")
@@ -93,7 +109,9 @@ class Primer3():
 		f.write("\n")
 		f.write("P3_FILE_FLAG=1")
 		f.write("\n")
-		f.write("SEQUENCE_INTERNAL_EXCLUDED_REGION=140,20") #add "start coord, length"
+		f.write("SEQUENCE_INTERNAL_EXCLUDED_REGION=")
+		f.write(str(index))
+		f.write(",19") #add "start coord, length"
 		f.write("\n")
 		f.write("PRIMER_OPT_GC_PERCENT=50")
 		f.write("\n")
@@ -111,8 +129,8 @@ class Primer3():
 
 		f.close()
 
-	def parseFile(self):
-		f=open(self.fas)
+	def parseFile(self, fasta):
+		f=open(fasta)
 		data=f.readlines()
 		f.close()
 		data=[l.strip() for l in data]
