@@ -7,6 +7,7 @@ import sys
 from Bio import AlignIO
 from Bio.Align import AlignInfo
 
+from checkpoint import Checkpoint
 from program import Program
 from maketestdir import MakeTestDir
 
@@ -17,21 +18,28 @@ class Muscle():
 		self.fas = f
 		basename=os.path.basename(f)
 
-		print("Aligning", basename)
+		self.tracker=Checkpoint(jsonFile)
+		self.done=self.tracker.loadJson()
 
-		mtd_align = MakeTestDir(dirname)
-		dirnamecon = dirname + "_consensus"
-		mtd_consensus = MakeTestDir(dirnamecon)
-		self.aligned=mtd_align.testDir()
-		self.consensus=mtd_consensus.testDir()
+		if basename not in self.done.keys():
+			print("Aligning", basename)
 
-		self.out=os.path.join(self.aligned, basename)
+			mtd_align = MakeTestDir(dirname)
+			dirnamecon = dirname + "_consensus"
+			mtd_consensus = MakeTestDir(dirnamecon)
+			self.aligned=mtd_align.testDir()
+			self.consensus=mtd_consensus.testDir()
 
-		command = self.makeCommand()
-		prog = Program(command)
-		prog.runProgram()
-		print(command)
-		self.makeConsensus(basename)
+			self.out=os.path.join(self.aligned, basename)
+
+			command = self.makeCommand()
+			prog = Program(command)
+			prog.runProgram()
+			print(command)
+			self.makeConsensus(basename)
+			self.done[basename]=1
+			self.tracker.writeJson(self.done)
+
 
 	def makeCommand(self):
 		string = "muscle -in " + self.fas + " -out " + self.out
