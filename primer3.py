@@ -55,8 +55,9 @@ class Primer3():
 	def makeFile(self, name, seq, index):
 		fn=name + ".p3in.txt"
 		fn=os.path.join(self.p3inDir, fn)
-		
-		seq=seq.replace("-", "N")
+	
+		# make sure any ambiguities are converted to Ns
+		seq=self.convertN(seq)
 
 		f = open(fn, 'w')
 		f.write("SEQUENCE_ID=")
@@ -128,6 +129,13 @@ class Primer3():
 		f.write("\n")
 
 		f.close()
+
+	def convertN(self, seq):
+		iupac = ["M", "R", "W", "S", "Y", "K", "V", "H", "D", "B", "-"]
+		for b in iupac:
+			seq=seq.replace(b, "N")
+		return seq
+
 
 	def parseFile(self, fasta):
 		f=open(fasta)
