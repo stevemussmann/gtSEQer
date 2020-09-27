@@ -10,7 +10,7 @@ from maketestdir import MakeTestDir
 class Primer3():
 	'Class for executing primer3'
 
-	def __init__(self, fn, flank, probeflank):
+	def __init__(self, fn, flank, probeflank, product, productErr, size, sizeErr, temp, tempErr):
 		# make directories
 		mtd_mac = MakeTestDir("muscle_aligned_consensus")
 		mac = mtd_mac.testDir()
@@ -49,7 +49,7 @@ class Primer3():
 			warnfh.close()
 		
 		# make p3in file
-		self.makeFile(seqinfo["ID"], seqinfo["SEQUENCE"], index, probeLength)
+		self.makeFile(seqinfo["ID"], seqinfo["SEQUENCE"], index, probeLength, product, productErr, size, sizeErr, temp, tempErr)
 
 		# run primer3_core
 		comm, out = self.makeCommand(fn)
@@ -62,7 +62,7 @@ class Primer3():
 
 		self.parseOutput(out, fn)
 
-	def makeFile(self, name, seq, index, probeLength):
+	def makeFile(self, name, seq, index, probeLength, product, productErr, size, sizeErr, temp, tempErr):
 		fn=name + ".p3in.txt"
 		fn=os.path.join(self.p3inDir, fn)
 	
@@ -91,25 +91,35 @@ class Primer3():
 		f.write("\n")
 		f.write("PRIMER_NUM_RETURN=1")
 		f.write("\n")
-		f.write("PRIMER_OPT_SIZE=22")
+		f.write("PRIMER_OPT_SIZE=")
+		f.write(str(size))
 		f.write("\n")
-		f.write("PRIMER_MIN_SIZE=18")
+		f.write("PRIMER_MIN_SIZE=")
+		f.write(str(size-sizeErr))
 		f.write("\n")
-		f.write("PRIMER_MAX_SIZE=24")
+		f.write("PRIMER_MAX_SIZE=")
+		f.write(str(size+sizeErr))
 		f.write("\n")
 		f.write("PRIMER_MAX_NS_ACCEPTED=0")
 		f.write("\n")
-		f.write("PRIMER_PRODUCT_SIZE_RANGE=90-120")
+		f.write("PRIMER_PRODUCT_SIZE_RANGE=")
+		f.write(str(product-productErr))
+		f.write("-")
+		f.write(str(product+productErr))
 		f.write("\n")
-		f.write("PRIMER_PRODUCT_OPT_SIZE=100")
+		f.write("PRIMER_PRODUCT_OPT_SIZE=")
+		f.write(str(product))
 		f.write("\n")
 		f.write("PRIMER_GC_CLAMP=1")
 		f.write("\n")
-		f.write("PRIMER_MIN_TM=58")
+		f.write("PRIMER_MIN_TM=")
+		f.write(str(temp-tempErr))
 		f.write("\n")
-		f.write("PRIMER_OPT_TM=61")
+		f.write("PRIMER_OPT_TM=")
+		f.write(str(temp))
 		f.write("\n")
-		f.write("PRIMER_MAX_TM=64")
+		f.write("PRIMER_MAX_TM=")
+		f.write(str(temp+tempErr))
 		f.write("\n")
 		f.write("PRIMER_PAIR_MAX_DIFF_TM=2")
 		f.write("\n")

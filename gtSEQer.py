@@ -80,7 +80,7 @@ def main():
 	cf = mtdcf.testDir()
 	conFasta=[f for f in listdir(cf) if os.path.isfile(os.path.join(cf, f))]
 	for f in conFasta:
-		p3 = Primer3(f, input.args.flank, input.args.probeflank)
+		p3 = Primer3(f, input.args.flank, input.args.probeflank, input.args.product, input.args.producterr, input.args.size, input.args.sizeerr, input.args.temp, input.args.temperr)
 
 main()
 

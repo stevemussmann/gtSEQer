@@ -53,42 +53,36 @@ class ComLine():
 							default="all.genomecov.txt.gz",
 							help="Specify the file extension for coverage file names. The beginning of the name should match individuals in the indlist."
 		)
-		#implement
 		parser.add_argument("-p", "--product",
 							dest='product',
 							type=int,
 							default=105,
 							help="Specify the optimal PCR product size."
 		)
-		#implement
 		parser.add_argument("-P", "--producterr",
 							dest='producterr',
 							type=int,
 							default=15,
 							help="Specify the +/- error for optimal PCR product size."
 		)
-		#implement
 		parser.add_argument("-s", "--size",
 							dest='size',
 							type=int,
 							default=21,
 							help="Specify the ideal length for a primer"
 		)
-		#implement
 		parser.add_argument("-S", "--sizeerr",
 							dest='sizeerr',
 							type=int,
 							default=3,
 							help="Specify the acceptable +/- error for ideal primer length"
 		)
-		#implement
 		parser.add_argument("-t", "--temp",
 							dest='temp',
 							type=int,
 							default=61,
 							help="Specify targeted melting temperature for primers."
 		)
-		#implement
 		parser.add_argument("-T", "--temperr",
 							dest='temperr',
 							type=int,
