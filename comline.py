@@ -10,20 +10,20 @@ class ComLine():
 
 	def __init__(self, args):
 		parser = argparse.ArgumentParser()
-		parser.add_argument("-v", "--vcf",
-							dest='vcf',
+		parser.add_argument("-l", "--loci",
+							dest='loci',
 							required=True,
-							help="Specify a vcf file for input that contains target SNPs"
+							help="Specify a file for input that contains target SNP coordinates in the first two columns (Chromosome \\tab Position). This can also be a filtered VCF file."
 		)
 		parser.add_argument("-g", "--genome",
 							dest='genome',
 							required=True,
 							help="Specify the name of a reference genome in fasta format"
 		)
-		parser.add_argument("-z", "--vcfgz",
-							dest='vcfgz',
-							nargs='?',
-							help="Specify the name of the gzipped vcf (optional)"
+		parser.add_argument("-v", "--vcf",
+							dest='vcf',
+							required=True,
+							help="Specify the name of the gzipped vcf"
 		)
 		parser.add_argument("-i", "--indlist",
 							dest='indlist',
@@ -50,23 +50,26 @@ class ComLine():
 							dest='flank',
 							type=int,
 							default=150,
-							help="Specify the amount of flanking sequence you want to retain on either side of the SNP. "
+							help="Specify the amount of flanking sequence you want to retain on either side of the SNP when extracting loci from the reference genome."
+		)
+		parser.add_argument("-p", "--probeflank",
+							dest='probeflank',
+							type=int,
+							default=8,
+							help="Specify the amount of flanking sequence you want to retain on either side of the SNP whene extracting probes from the reference genome."
 		)
 		parser.add_argument("-x", "--overwrite",
 							dest='overwrite',
 							action='store_true',
-							help="Turn on to overwrite previous files"
+							help="Turn on to overwrite previous files (Not fully implemented yet)."
 
 		)
 
 		self.args = parser.parse_args()
 
-		#sets default value of vcfgz to append "gz" extension to vcf arg
-		if self.args.vcfgz is None:
-			self.args.vcfgz = self.args.vcf + ".gz"
-
 		#check if files and directories exist
 		self.exists( self.args.vcf )
+		self.exists( self.args.loci )
 		self.exists( self.args.indlist )
 		self.exists( self.args.genome )
 		self.dirExists( self.args.directory )

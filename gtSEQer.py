@@ -22,7 +22,7 @@ def main():
 	gen = Genome(input.args.genome)
 
 	# identify target SNPs and return coordinates in reference genome
-	target = VCF(input.args.vcf)
+	target = VCF(input.args.loci)
 	snps = target.getSNPs()
 
 	# apply coverage cutoff to BEDtools output
@@ -32,7 +32,7 @@ def main():
 	# Extract target plus flanking region from reference genome
 	regions = Extractor(snps, input.args.indlist, input.args.flank, gen.seqLengths)
 	regions.extract()
-	regions.makeCommands(input.args.genome, input.args.vcfgz) #returns list of output files
+	regions.makeCommands(input.args.genome, input.args.vcf) #returns list of output files
 
 	## operate on all output Fasta files
 	# filter extracted_regions

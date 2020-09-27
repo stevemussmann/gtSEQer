@@ -7,6 +7,7 @@ class VCF():
 
 	def __init__(self, f):
 		self.vcf = f
+		print(self.vcf)
 		self.data=self.readFile()
 
 	def getSNPs(self):
