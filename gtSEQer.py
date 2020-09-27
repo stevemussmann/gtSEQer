@@ -72,6 +72,10 @@ def main():
 	runMuscle("filtered_probes", "muscle_probes.json", "muscle_aligned_probes")
 
 	# Run primer3
+	if os.path.isfile("summary.txt"):
+		os.remove("summary.txt")
+	if os.path.isfile("warnlist.txt"):
+		os.remove("warnlist.txt")
 	mtdcf = MakeTestDir("muscle_aligned_consensus")
 	cf = mtdcf.testDir()
 	conFasta=[f for f in listdir(cf) if os.path.isfile(os.path.join(cf, f))]

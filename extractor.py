@@ -14,8 +14,6 @@ class Extractor():
 
 	def __init__(self, f, i, e, l, p):
 		# tracks which files have been done
-		#self.done=dict()
-		#self.loadJson()
 		self.tracker = Checkpoint("extractor.json")
 		self.done=self.tracker.loadJson()
 
@@ -121,12 +119,10 @@ class Extractor():
 
 					# write probe to file
 					self.parseOutput(probeOutput, probefn, ind)
-					#print(probeOutput)
 
 					# write to json file
 					self.done[coord].append(ind)
 					self.tracker.writeJson(self.done)
-					#self.writeJson()
 
 	def parseOutput(self, o, fn, ind):
 		l = o.splitlines()
@@ -136,16 +132,3 @@ class Extractor():
 				fh.write(item)
 				fh.write("\n")
 	
-	#def loadJson(self):
-	#	if os.path.isfile("extractor.json"):
-	#		print("\n**********************************")
-	#		print("Resuming from previous checkpoint.")
-	#		print("**********************************\n")
-	#		with open("extractor.json") as f:
-	#			self.done = json.load(f)
-	
-	#def writeJson(self):
-	#	with open("extractor.json", 'w' ) as json_file:
-	#		json.dump(self.done, json_file)
-
-				
