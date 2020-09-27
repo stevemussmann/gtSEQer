@@ -10,7 +10,7 @@ from maketestdir import MakeTestDir
 class Primer3():
 	'Class for executing primer3'
 
-	def __init__(self, fn):
+	def __init__(self, fn, flank, probeflank):
 		# make directories
 		mtd_mac = MakeTestDir("muscle_aligned_consensus")
 		mac = mtd_mac.testDir()
@@ -27,6 +27,9 @@ class Primer3():
 		self.p3inDir=mtd_p3in.testDir()
 		self.p3outDir=mtd_p3out.testDir()
 		
+		#calculate probe length
+		probeLength = (2*probeflank)+1
+
 		# parse sequence files
 		seqinfo = self.parseFile(template)
 		probeinfo = self.parseFile(probe)
@@ -35,24 +38,31 @@ class Primer3():
 		index = seqinfo["SEQUENCE"].find(probeinfo["SEQUENCE"])
 		print(str(index))
 
-		if(index > 0):
-			# make p3in file
-			self.makeFile(seqinfo["ID"], seqinfo["SEQUENCE"], index)
+		if(index < 0):
+			print("WARNING: Probe not found in sequence", fn)
+			print("Attempting to place probe in expected location.")
+			print("Manually inspect any locus present in warnlist.txt")
+			index=flank-probeflank
+			warnfh=open("warnlist.txt", 'a')
+			warnfh.write(fn)
+			warnfh.write("\n")
+			warnfh.close()
+		
+		# make p3in file
+		self.makeFile(seqinfo["ID"], seqinfo["SEQUENCE"], index, probeLength)
 
-			# run primer3_core
-			comm, out = self.makeCommand(fn)
-			#print(comm)
+		# run primer3_core
+		comm, out = self.makeCommand(fn)
+		#print(comm)
 
-			print("Finding primers for", fn)
+		print("Finding primers for", fn)
 
-			prog = Program(comm)
-			prog.runProgram()
+		prog = Program(comm)
+		prog.runProgram()
 
-			self.parseOutput(out, fn)
-		else:
-			print("Probe not found in sequence", fn)
+		self.parseOutput(out, fn)
 
-	def makeFile(self, name, seq, index):
+	def makeFile(self, name, seq, index, probeLength):
 		fn=name + ".p3in.txt"
 		fn=os.path.join(self.p3inDir, fn)
 	
@@ -68,7 +78,8 @@ class Primer3():
 		f.write("\n")
 		f.write("SEQUENCE_TARGET=")
 		f.write(str(index)) # start coordinate
-		f.write(",19") # length
+		f.write(",") # length
+		f.write(str(probeLength))
 		f.write("\n")
 		f.write("PRIMER_TASK=pick_detection_primers")
 		f.write("\n")
@@ -112,7 +123,8 @@ class Primer3():
 		f.write("\n")
 		f.write("SEQUENCE_INTERNAL_EXCLUDED_REGION=")
 		f.write(str(index))
-		f.write(",19") #add "start coord, length"
+		f.write(",") #add "start coord, length"
+		f.write(str(probeLength))
 		f.write("\n")
 		f.write("PRIMER_OPT_GC_PERCENT=50")
 		f.write("\n")

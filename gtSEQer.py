@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from checkpoint import Checkpoint
 from comline import ComLine
 from coverage import Coverage
 from DefaultListOrderedDict import DefaultListOrderedDict
@@ -14,6 +15,19 @@ from vcf import VCF
 import os.path
 import sys
 from os import listdir
+
+def runMuscle(dirName, jsonName, muscleDirName):
+	mtdal = MakeTestDir(dirName)
+	al = mtdal.testDir()
+	filteredFiles=[f for f in listdir(al) if os.path.isfile(os.path.join(al, f))]
+	muscleTracker=Checkpoint(jsonName)
+	muscleDone=muscleTracker.loadJson()
+	for f in filteredFiles:
+		if f not in muscleDone.keys():
+			fpath=os.path.join(al, f)
+			filt = Muscle(fpath, muscleDirName)
+			muscleDone[f]=1
+			muscleTracker.writeJson(muscleDone)
 
 
 def main():
@@ -30,7 +44,7 @@ def main():
 	cov.applyMinCov(input.args.cover, input.args.overwrite)
 
 	# Extract target plus flanking region from reference genome
-	regions = Extractor(snps, input.args.indlist, input.args.flank, gen.seqLengths)
+	regions = Extractor(snps, input.args.indlist, input.args.flank, gen.seqLengths, input.args.probeflank)
 	regions.extract()
 	regions.makeCommands(input.args.genome, input.args.vcf) #returns list of output files
 
@@ -51,27 +65,18 @@ def main():
 		fpath = os.path.join(probe, f)
 		fas = Fasta(fpath, "filtered_probes")
 
-	# use Muscle to align files
-	mtdal = MakeTestDir("filtered_sequences")
-	al = mtdal.testDir()
-	filteredFiles=[f for f in listdir(al) if os.path.isfile(os.path.join(al, f))]
-	for f in filteredFiles:
-		fpath=os.path.join(al, f)
-		filt = Muscle(fpath, "muscle_aligned", "muscle_seqs.json")
+	# use Muscle to align sequences
+	runMuscle("filtered_sequences", "muscle_seqs.json", "muscle_aligned")
 
-	mtdalp = MakeTestDir("filtered_probes")
-	alp = mtdalp.testDir()
-	filteredProbes=[f for f in listdir(alp) if os.path.isfile(os.path.join(alp, f))]
-	for f in filteredProbes:
-		fpath=os.path.join(alp, f)
-		filt = Muscle(fpath, "muscle_aligned_probes", "muscle_probes.json")
+	# use Muscle to align probes
+	runMuscle("filtered_probes", "muscle_probes.json", "muscle_aligned_probes")
 
 	# Run primer3
 	mtdcf = MakeTestDir("muscle_aligned_consensus")
 	cf = mtdcf.testDir()
 	conFasta=[f for f in listdir(cf) if os.path.isfile(os.path.join(cf, f))]
 	for f in conFasta:
-		p3 = Primer3(f)
+		p3 = Primer3(f, input.args.flank, input.args.probeflank)
 
 main()
 

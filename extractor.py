@@ -12,7 +12,7 @@ from program import Program
 class Extractor():
 	'Class for pulling genome regions from reference'
 
-	def __init__(self, f, i, e, l):
+	def __init__(self, f, i, e, l, p):
 		# tracks which files have been done
 		#self.done=dict()
 		#self.loadJson()
@@ -21,6 +21,7 @@ class Extractor():
 
 		self.targets = f
 		self.flank=e
+		self.probeFlank=p
 		self.genLen=l
 		f=open(i)
 		d=f.readlines()
@@ -52,10 +53,10 @@ class Extractor():
 				if(end > self.genLen[chrom]):
 					end = self.genLen[chrom]
 
-				pstart = int(snp) - 9
+				pstart = int(snp) - self.probeFlank
 				if( pstart < 1 ):
 					pstart = 1
-				pend = int(snp) + 9
+				pend = int(snp) + self.probeFlank
 				if(pend > self.genLen[chrom]):
 					pend = self.genLen[chrom]
 

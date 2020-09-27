@@ -7,38 +7,31 @@ import sys
 from Bio import AlignIO
 from Bio.Align import AlignInfo
 
-from checkpoint import Checkpoint
 from program import Program
 from maketestdir import MakeTestDir
 
 class Muscle():
 	'Class for running Muscle on fasta files'
 
-	def __init__(self,f, dirname, jsonFile):
+	def __init__(self,f, dirname):
 		self.fas = f
 		basename=os.path.basename(f)
 
-		self.tracker=Checkpoint(jsonFile)
-		self.done=self.tracker.loadJson()
+		print("Aligning", basename)
 
-		if basename not in self.done.keys():
-			print("Aligning", basename)
+		mtd_align = MakeTestDir(dirname)
+		dirnamecon = dirname + "_consensus"
+		mtd_consensus = MakeTestDir(dirnamecon)
+		self.aligned=mtd_align.testDir()
+		self.consensus=mtd_consensus.testDir()
 
-			mtd_align = MakeTestDir(dirname)
-			dirnamecon = dirname + "_consensus"
-			mtd_consensus = MakeTestDir(dirnamecon)
-			self.aligned=mtd_align.testDir()
-			self.consensus=mtd_consensus.testDir()
+		self.out=os.path.join(self.aligned, basename)
 
-			self.out=os.path.join(self.aligned, basename)
-
-			command = self.makeCommand()
-			prog = Program(command)
-			prog.runProgram()
-			print(command)
-			self.makeConsensus(basename)
-			self.done[basename]=1
-			self.tracker.writeJson(self.done)
+		command = self.makeCommand()
+		prog = Program(command)
+		prog.runProgram()
+		print(command)
+		self.makeConsensus(basename)
 
 
 	def makeCommand(self):
