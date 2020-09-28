@@ -21,7 +21,7 @@ This pipeline was written to be run on Unix based operating systems, such as the
 ## Required inputs:
 
 The following options are required:
-* (**-l, --loci**): list of target SNPs. This can be a two-colum tab-delimited file with the format of CHROMOSOME <tab> POSITION, or you can provide an uncompressed VCF file.
+* (**-l, --loci**): list of target SNPs. This can be a two-colum tab-delimited file with the format of CHROMOSOME \<tab\> POSITION, or you can provide an uncompressed VCF file.
 * (**-g, --genome**): reference genome in fasta format. File must be uncompressed.
 * (**-v, --vcf**): compressed VCF file containing all detected variants. Before executing the pipeline, this file must be indexed using the command "bcftools index all_variants.vcf"
 * (**-i, --indlist**): list of individuals present the VCF input that will be used for GTseq locus development.
