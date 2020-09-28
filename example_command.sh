@@ -1,0 +1,1 @@
+gtSEQer.py -l sd.private_alleles.adj60bp.recode.vcf -g GCF_002163495.1_Omyk_1.0_genomic.fna -v raw_snp_geno.all-spec.vcf.gz -i gilalist -d /home/mussmann/Desktop/dx2002/dexter_panel_genomecov/0_full_bam/
